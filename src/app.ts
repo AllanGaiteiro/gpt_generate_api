@@ -1,10 +1,29 @@
 import * as bodyParser from 'body-parser';
 //import express from 'express';
 import { Application, Express } from 'express-serve-static-core';
-const express = require('express');
-//import * as swaggerUi from 'swagger-ui-express';
+//import swaggerJsDoc from 'swagger-jsdoc';
+import * as swaggerUi from 'swagger-ui-express';
 //import * as swaggerDocument from './swagger.json';
+const express = require('express');
+const swaggerJsDoc = require('swagger-jsdoc');
+const path = require('path');
 
+const options = {
+        definition: {
+                openapi: '3.0.0',
+                info: {
+                        title: 'Minha API',
+                        version: '1.0.0',
+                        description: 'Descrição da minha API'
+                },
+                servers: [
+                        { url: 'http://localhost:4000' }
+                ]
+        },
+        apis: [path.join(__dirname, '/controllers/*.ts')],
+};
+
+const specs = swaggerJsDoc(options);
 export class App {
         public app: Application;
         public port: number;
@@ -16,8 +35,8 @@ export class App {
         }
         private initializeMiddlewares() {
                 this.app.use(bodyParser.json());
-                //this.app.use('/api-docs', swaggerUi.serve, 
-                //swaggerUi.setup(swaggerDocument));
+                this.app.use('/api-docs', swaggerUi.serve,
+                        swaggerUi.setup(specs));
         }
         private initializeControllers(controllers: Express[]) {
                 controllers.forEach((controller) => {
